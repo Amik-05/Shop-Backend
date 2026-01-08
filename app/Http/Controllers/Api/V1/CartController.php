@@ -44,10 +44,7 @@ class CartController extends Controller
         else
         {
             $product = Product::where('id',$data['product_id'])->first();
-            /*return response()->json([
-                'message' => 'Товар добавлен в корзину',
-                'data' => $product
-            ]);*/
+
             if ($product->stock >= $data['quantity'])
             {
                 $cartItem = CartItem::create([
