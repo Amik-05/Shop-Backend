@@ -61,7 +61,7 @@ info:
 
 servers:
   - url: http://localhost/api/v1
-    description: Local server
+    description: Local development server
 
 paths:
 
@@ -77,7 +77,7 @@ paths:
               $ref: '#/components/schemas/RegisterRequest'
       responses:
         201:
-          description: User registered
+          description: User successfully registered
         422:
           description: Validation error
 
@@ -121,6 +121,8 @@ paths:
           description: Product created
         422:
           description: Validation error
+        401:
+          description: Unauthorized
 
   /products/{id}:
     get:
@@ -160,6 +162,8 @@ paths:
           description: Product updated
         404:
           description: Product not found
+        401:
+          description: Unauthorized
 
     delete:
       summary: Delete product
@@ -175,6 +179,8 @@ paths:
       responses:
         204:
           description: Product deleted
+        401:
+          description: Unauthorized
 
   /categories:
     get:
