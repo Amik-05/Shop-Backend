@@ -53,10 +53,270 @@ Backend API для интернет-магазина с поддержкой п�
 - защита от некорректных данных
 - архитектура, готовая к масштабированию
 
-#### Возможные улучшения:
-- Payment Service
-- Soft delete товаров
-- История статусов заказа
-- Events & Listeners
-- API Resources
-- Unit / Feature tests
+openapi: 3.0.3
+info:
+  title: Shop Backend API
+  version: 1.0.0
+  description: REST API for managing products and categories
+
+servers:
+  - url: http://localhost/api/v1
+    description: Local server
+
+paths:
+
+  /auth/register:
+    post:
+      summary: Register new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        201:
+          description: User registered
+        422:
+          description: Validation error
+
+  /auth/login:
+    post:
+      summary: Login user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: Login successful
+        401:
+          description: Invalid credentials
+
+  /products:
+    get:
+      summary: Get all products
+      tags: [Products]
+      responses:
+        200:
+          description: List of products
+
+    post:
+      summary: Create product
+      tags: [Products]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreProductRequest'
+      responses:
+        201:
+          description: Product created
+        422:
+          description: Validation error
+
+  /products/{id}:
+    get:
+      summary: Get product by ID
+      tags: [Products]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Product data
+        404:
+          description: Product not found
+
+    put:
+      summary: Update product
+      tags: [Products]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        200:
+          description: Product updated
+        404:
+          description: Product not found
+
+    delete:
+      summary: Delete product
+      tags: [Products]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Product deleted
+
+  /categories:
+    get:
+      summary: Get all categories
+      tags: [Categories]
+      responses:
+        200:
+          description: List of categories
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          example: password123
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          example: password123
+
+    StoreProductRequest:
+      type: object
+      required:
+        - name
+        - price
+        - category_id
+        - stock
+        - slug
+      properties:
+        name:
+          type: string
+          example: iPhone 15
+        description:
+          type: string
+          example: Latest Apple smartphone
+        price:
+          type: number
+          format: float
+          example: 999.99
+        category_id:
+          type: integer
+          example: 1
+        stock:
+          type: integer
+          example: 50
+        slug:
+          type: string
+          example: iphone-15
+        is_active:
+          type: boolean
+          example: true
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        category_id:
+          type: integer
+        stock:
+          type: integer
+        slug:
+          type: string
+        is_active:
+          type: boolean
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        category_id:
+          type: integer
+        stock:
+          type: integer
+        slug:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
